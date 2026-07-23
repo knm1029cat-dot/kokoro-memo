@@ -1,7 +1,7 @@
 {
-  "name": "こころメモ - 通院サポート日記",
+  "name": "こころメモ",
   "short_name": "こころメモ",
-  "description": "気分の記録・思考整理・日記を、通院時に医師や心理師へ見せるメモとしてまとめられるアプリ",
+  "description": "気分の記録・考えたこと・日記を書き留められるメモアプリ",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f4f1fb",
