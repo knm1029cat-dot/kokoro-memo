@@ -535,7 +535,7 @@
     <section class="tab" data-tab="diary">
       <div class="card">
         <h2>日記を書く</h2>
-        <p class="section-desc">形式にとらわれず、その日にあったことや感じたことを自由に書き留めておけます。</p>
+        <p class="section-desc">書くことに迷ったら、下のボタンをタップすると書き出しのヒントが入ります。決まった形式はないので、思いつくことから自由に書いてください。</p>
 
         <form id="diaryForm">
           <div class="row2">
@@ -551,7 +551,8 @@
 
           <div class="field">
             <label for="diaryBody">本文</label>
-            <textarea id="diaryBody" style="min-height:160px" placeholder="自由に書いてください" required></textarea>
+            <div class="tag-chips" id="diaryPromptChips" style="margin-bottom:10px;"></div>
+            <textarea id="diaryBody" style="min-height:160px" placeholder="例）&#10;・今日あったこと&#10;・今の気分や体調&#10;・気になっていること" required></textarea>
           </div>
 
           <div class="btn-row">
@@ -637,6 +638,18 @@
 
     <!-- 設定 -->
     <section class="tab" data-tab="settings">
+      <div class="card">
+        <h2>日記のリマインダー通知</h2>
+        <p class="section-desc">
+          ホーム画面に追加したAndroid版Chromeでのみ利用できます。ブラウザの判断でタイミングが前後したり、届かない日もある「目安」の通知です。時刻の指定はできません。
+        </p>
+
+        <div class="btn-row">
+          <button type="button" class="secondary" id="notifyEnableBtn">通知を有効にする</button>
+        </div>
+        <div id="notifyStatus" class="status"></div>
+      </div>
+
       <div class="card">
         <h2>データのバックアップ</h2>
         <p class="section-desc">記録は端末内のブラウザにのみ保存されています。機種変更やブラウザの変更に備えて、定期的にエクスポートしておくことをおすすめします。</p>
@@ -981,6 +994,25 @@
       const diaryBody = document.getElementById('diaryBody');
       const diaryStatus = document.getElementById('diaryStatus');
       const diaryRecentList = document.getElementById('diaryRecentList');
+      const diaryPromptChips = document.getElementById('diaryPromptChips');
+
+      const DIARY_PROMPTS = ['今日あったこと', '今の気分・体調', '気になっていること', '眠れたか'];
+
+      function renderDiaryPromptChips() {
+        diaryPromptChips.innerHTML = '';
+        DIARY_PROMPTS.forEach(prompt => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'tag-chip';
+          chip.textContent = prompt;
+          chip.addEventListener('click', () => {
+            const prefix = diaryBody.value && !diaryBody.value.endsWith('\n') ? '\n' : '';
+            diaryBody.value += `${prefix}■ ${prompt}\n`;
+            diaryBody.focus();
+          });
+          diaryPromptChips.appendChild(chip);
+        });
+      }
 
       function resetDiaryForm() {
         diaryDate.value = isoDate(new Date());
@@ -1382,6 +1414,49 @@
         window.print();
       });
 
+      // ---------- notification reminder ----------
+      const notifyEnableBtn = document.getElementById('notifyEnableBtn');
+      const notifyStatus = document.getElementById('notifyStatus');
+
+      notifyEnableBtn.addEventListener('click', async () => {
+        if (!('Notification' in window)) {
+          setStatus(notifyStatus, 'このブラウザは通知に対応していません。', 'error');
+          return;
+        }
+        if (!('serviceWorker' in navigator)) {
+          setStatus(notifyStatus, 'このブラウザはサービスワーカーに対応していません。', 'error');
+          return;
+        }
+
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') {
+          setStatus(notifyStatus, '通知が許可されませんでした。', 'error');
+          return;
+        }
+
+        const registration = await navigator.serviceWorker.ready;
+
+        if (!('periodicSync' in registration)) {
+          setStatus(notifyStatus, 'この端末・ブラウザは定期通知に対応していません。Android版Chromeでホーム画面に追加してからお試しください。', 'error');
+          return;
+        }
+
+        try {
+          const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
+          if (status.state !== 'granted') {
+            setStatus(notifyStatus, '定期通知の権限が得られませんでした。ホーム画面に追加した状態で、しばらくアプリを使ってからもう一度お試しください。', 'error');
+            return;
+          }
+
+          await registration.periodicSync.register('diary-reminder', {
+            minInterval: 20 * 60 * 60 * 1000
+          });
+          setStatus(notifyStatus, '通知を設定しました。届くタイミングはブラウザが判断するため、前後したり届かない日もあります。', 'success');
+        } catch (e) {
+          setStatus(notifyStatus, '通知の設定に失敗しました。' + (e && e.message ? e.message : ''), 'error');
+        }
+      });
+
       // ---------- settings tab ----------
       const exportDataBtn = document.getElementById('exportDataBtn');
       const importDataInput = document.getElementById('importDataInput');
@@ -1451,6 +1526,7 @@
       // ---------- init ----------
       renderTagChips(moodTagChips, EMOTION_TAGS, selectedMoodTags);
       populateThoughtEmotionSelect();
+      renderDiaryPromptChips();
       resetMoodForm();
       resetThoughtForm();
       resetDiaryForm();
