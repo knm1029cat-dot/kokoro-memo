@@ -1,4 +1,4 @@
-const CACHE_NAME = 'kokoro-memo-v2';
+const CACHE_NAME = 'kokoro-memo-v3';
 const APP_SHELL = [
   './',
   './index.html',
@@ -34,5 +34,28 @@ self.addEventListener('fetch', event => {
         return response;
       })
       .catch(() => caches.match(event.request))
+  );
+});
+
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'diary-reminder') {
+    event.waitUntil(
+      self.registration.showNotification('こころメモ', {
+        body: '今日の日記を書いてみませんか？',
+        icon: './icon-512.png',
+        badge: './icon-512.png'
+      })
+    );
+  }
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window' }).then(clientsArr => {
+      const client = clientsArr.find(c => 'focus' in c);
+      if (client) return client.focus();
+      return self.clients.openWindow('./');
+    })
   );
 });
