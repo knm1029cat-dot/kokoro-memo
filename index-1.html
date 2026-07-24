@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6d6ac2">
+  <link rel="apple-touch-icon" href="icon-512.png">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>こころメモ</title>
+  <style>
+    :root {
+      --bg: #f4f1fb;
+      --card: #ffffff;
+      --text: #2b2b38;
+      --muted: #6b6b7d;
+      --line: #e4e1f0;
+      --accent: #6d6ac2;
+      --accent-dark: #514ea3;
+      --accent-soft: #ece9fb;
+      --pink: #ff8fa3;
+      --pink-soft: #ffeaef;
+      --danger: #dc2626;
+      --danger-soft: #fef2f2;
+      --ok: #16a34a;
+      --ok-soft: #f0fdf4;
+      --warn: #b45309;
+      --warn-soft: #fffbeb;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Hiragino Sans", "Noto Sans JP", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px 16px 60px;
+    }
+
+    header.card {
+      background: linear-gradient(135deg, #7d78d1, #6badb6);
+      color: #fff;
+      border: none;
+    }
+
+    header.card h1 { margin: 0 0 6px; font-size: 1.6rem; }
+    header.card p { margin: 0; opacity: 0.92; font-size: 0.92rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(80, 70, 140, 0.06);
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      margin: 0 0 4px;
+      font-size: 1.15rem;
+    }
+
+    .section-desc {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .privacy-note {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      margin-top: 10px;
+    }
+
+    nav.app-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 2px 14px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    nav.app-nav button {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 9px 16px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    nav.app-nav button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    section.tab { display: none; }
+    section.tab.active { display: block; }
+
+    label {
+      font-weight: 700;
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .field { margin-bottom: 16px; }
+
+    input, select, textarea, button { font: inherit; }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="datetime-local"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      color: var(--text);
+    }
+
+    textarea { min-height: 80px; resize: vertical; }
+
+    .row2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 620px) {
+      .row2 { grid-template-columns: 1fr; }
+    }
+
+    .mood-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .mood-slider-wrap input[type="range"] { flex: 1; }
+
+    .mood-face {
+      font-size: 1.8rem;
+      width: 46px;
+      text-align: center;
+    }
+
+    .mood-score-label {
+      font-weight: 800;
+      color: var(--accent-dark);
+      min-width: 34px;
+      text-align: center;
+      font-size: 1.1rem;
+    }
+
+    .tag-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-chip {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 999px;
+      padding: 7px 14px;
+      font-size: 0.86rem;
+      cursor: pointer;
+      color: var(--text);
+    }
+
+    .tag-chip.selected {
+      background: var(--pink-soft);
+      border-color: var(--pink);
+      color: #b6304a;
+      font-weight: 700;
+    }
+
+    .custom-tag-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .custom-tag-row input { flex: 1; }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 11px 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary { background: var(--accent); color: #fff; }
+    .secondary { background: var(--accent-soft); color: var(--accent-dark); }
+    .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+    .danger-btn { background: var(--danger-soft); color: var(--danger); }
+
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+    .status {
+      margin-top: 12px;
+      font-weight: 600;
+      padding: 11px 14px;
+      border-radius: 12px;
+      display: none;
+      font-size: 0.9rem;
+    }
+
+    .status.show { display: block; }
+
+    .status.error { color: var(--danger); background: var(--danger-soft); border: 1px solid #fecaca; }
+    .status.success { color: var(--ok); background: var(--ok-soft); border: 1px solid #bbf7d0; }
+    .status.info { color: var(--accent-dark); background: var(--accent-soft); border: 1px solid #d9d5f5; }
+
+    .entry-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+
+    .entry-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: #fcfcfd;
+    }
+
+    .entry-item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .entry-date {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .entry-badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent-dark);
+      margin-right: 6px;
+    }
+
+    .entry-badge.mood { background: var(--pink-soft); color: #b6304a; }
+    .entry-badge.thought { background: #e0f2fe; color: #075985; }
+    .entry-badge.diary { background: #ecfccb; color: #3f6212; }
+
+    .entry-body { font-size: 0.88rem; color: var(--text); white-space: pre-wrap; }
+    .entry-meta { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+
+    .entry-actions { display: flex; gap: 6px; }
+    .entry-actions button {
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      border-radius: 8px;
+    }
+
+    .empty-note {
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .filter-row select { width: auto; }
+
+    .summary-header {
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .summary-header .range {
+      font-weight: 800;
+      color: var(--accent-dark);
+      font-size: 1.05rem;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 620px) {
+      .stat-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .stat-box {
+      background: var(--accent-soft);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .stat-box .num { font-size: 1.3rem; font-weight: 800; color: var(--accent-dark); }
+    .stat-box .lbl { font-size: 0.75rem; color: var(--muted); }
+
+    .chart-wrap {
+      display: flex;
+      align-items: flex-end;
+      gap: 6px;
+      height: 140px;
+      padding: 10px 6px 0;
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+      margin-bottom: 8px;
+    }
+
+    .chart-bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 100%;
+    }
+
+    .chart-bar {
+      width: 20px;
+      border-radius: 6px 6px 0 0;
+      background: var(--accent);
+    }
+
+    .chart-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .summary-block { margin-top: 18px; }
+    .summary-block h3 {
+      font-size: 0.95rem;
+      margin: 0 0 10px;
+      color: var(--accent-dark);
+      border-left: 4px solid var(--accent);
+      padding-left: 8px;
+    }
+
+    .summary-line {
+      font-size: 0.88rem;
+      padding: 8px 0;
+      border-bottom: 1px dashed var(--line);
+    }
+
+    .summary-line:last-child { border-bottom: none; }
+
+    textarea#summaryTextOutput {
+      min-height: 260px;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+    }
+
+    .import-export-row { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    footer.disclaimer {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 18px 10px 4px;
+    }
+
+    @media print {
+      nav.app-nav, .no-print { display: none !important; }
+      body { background: #fff; }
+      .card { box-shadow: none; border: 1px solid #ccc; }
+      header.card { background: #fff !important; color: #000 !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="card">
+      <h1>こころメモ</h1>
+      <p>気分の記録・考えたこと・日記をメモとしてまとめます。</p>
+      <div class="privacy-note">🔒 <span>記録はすべてこの端末内（ブラウザ）にのみ保存され、どこにも送信されません。</span></div>
+    </header>
+
+    <nav class="app-nav" id="appNav">
+      <button type="button" data-tab="mood" class="active">📝 記録</button>
+      <button type="button" data-tab="thought">🧠 思考整理</button>
+      <button type="button" data-tab="diary">📔 日記</button>
+      <button type="button" data-tab="history">🗂 履歴</button>
+      <button type="button" data-tab="summary">🩺 通院メモ</button>
+      <button type="button" data-tab="settings">⚙ 設定</button>
+    </nav>
+
+    <!-- 気分記録 -->
+    <section class="tab active" data-tab="mood">
+      <div class="card">
+        <h2>今の気分を記録する</h2>
+        <p class="section-desc">気分のスコアや感情を記録しておくと、あとで気分の波を振り返りやすくなります。</p>
+
+        <form id="moodForm">
+          <div class="field">
+            <label for="moodDatetime">日時</label>
+            <input type="datetime-local" id="moodDatetime" required />
+          </div>
+
+          <div class="field">
+            <label>気分のスコア（0=とてもつらい 〜 10=とても良い）</label>
+            <div class="mood-slider-wrap">
+              <span class="mood-face" id="moodFace">😐</span>
+              <input type="range" id="moodScore" min="0" max="10" value="5" />
+              <span class="mood-score-label" id="moodScoreLabel">5</span>
+            </div>
+          </div>
+
+          <div class="field">
+            <label>感情タグ（複数選択可）</label>
+            <div class="tag-chips" id="moodTagChips"></div>
+            <div class="custom-tag-row">
+              <input type="text" id="moodCustomTag" placeholder="その他の感情を追加" />
+              <button type="button" class="secondary" id="moodAddTagBtn">追加</button>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="moodSleepHours">睡眠時間（任意・時間）</label>
+              <input type="number" id="moodSleepHours" min="0" max="24" step="0.5" placeholder="例: 6.5" />
+            </div>
+            <div class="field">
+              <label for="moodSleepQuality">睡眠の質（任意）</label>
+              <select id="moodSleepQuality">
+                <option value="">選択してください</option>
+                <option value="良い">良い</option>
+                <option value="普通">普通</option>
+                <option value="悪い">悪い</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="moodNote">メモ</label>
+            <textarea id="moodNote" placeholder="体調や考えたことなど自由に"></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="primary">記録を保存</button>
+          </div>
+          <div id="moodStatus" class="status"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>最近の気分記録</h2>
+        <div id="moodRecentList" class="entry-list"></div>
+      </div>
+    </section>
+
+    <!-- 思考整理 -->
+    <section class="tab" data-tab="thought">
+      <div class="card">
+        <h2>考えたことをメモする</h2>
+        <p class="section-desc">気になったことがあったときに、状況や思ったこと・気分をそのまま書き出しておくメモです。うまくまとめようとしなくて大丈夫です。</p>
+
+        <form id="thoughtForm">
+          <div class="field">
+            <label for="thoughtDatetime">日時</label>
+            <input type="datetime-local" id="thoughtDatetime" required />
+          </div>
+
+          <div class="field">
+            <label for="thoughtSituation">状況・出来事</label>
+            <textarea id="thoughtSituation" placeholder="いつ、どこで、何があったか" required></textarea>
+          </div>
+
+          <div class="field">
+            <label for="thoughtAutomatic">そのとき思ったこと</label>
+            <textarea id="thoughtAutomatic" placeholder="頭に浮かんだ考えや言葉" required></textarea>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="thoughtEmotion">そのときの気分</label>
+              <select id="thoughtEmotion"></select>
+            </div>
+            <div class="field">
+              <label for="thoughtIntensityBefore">気分の強さ: <span id="thoughtIntensityBeforeLabel">50</span>%</label>
+              <input type="range" id="thoughtIntensityBefore" min="0" max="100" value="50" />
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="primary">記録を保存</button>
+          </div>
+          <div id="thoughtStatus" class="status"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>最近の思考整理の記録</h2>
+        <div id="thoughtRecentList" class="entry-list"></div>
+      </div>
+    </section>
+
+    <!-- 日記 -->
+    <section class="tab" data-tab="diary">
+      <div class="card">
+        <h2>日記を書く</h2>
+        <p class="section-desc">書くことに迷ったら、下のボタンをタップすると書き出しのヒントが入ります。決まった形式はないので、思いつくことから自由に書いてください。</p>
+
+        <form id="diaryForm">
+          <div class="row2">
+            <div class="field">
+              <label for="diaryDate">日付</label>
+              <input type="date" id="diaryDate" required />
+            </div>
+            <div class="field">
+              <label for="diaryTitle">タイトル（任意）</label>
+              <input type="text" id="diaryTitle" placeholder="例: 今日のこと" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="diaryBody">本文</label>
+            <div class="tag-chips" id="diaryPromptChips" style="margin-bottom:10px;"></div>
+            <textarea id="diaryBody" style="min-height:160px" placeholder="例）&#10;・今日あったこと&#10;・今の気分や体調&#10;・気になっていること" required></textarea>
+          </div>
+
+          <div class="btn-row">
+            <button type="submit" class="primary">日記を保存</button>
+          </div>
+          <div id="diaryStatus" class="status"></div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>最近の日記</h2>
+        <div id="diaryRecentList" class="entry-list"></div>
+      </div>
+    </section>
+
+    <!-- 履歴 -->
+    <section class="tab" data-tab="history">
+      <div class="card">
+        <h2>すべての記録</h2>
+        <p class="section-desc">気分記録・思考整理・日記をまとめて時系列で確認できます。</p>
+
+        <div class="filter-row">
+          <select id="historyTypeFilter">
+            <option value="all">すべての種類</option>
+            <option value="mood">気分記録</option>
+            <option value="thought">思考整理</option>
+            <option value="diary">日記</option>
+          </select>
+          <input type="date" id="historyFromFilter" />
+          <input type="date" id="historyToFilter" />
+          <button type="button" class="ghost" id="historyFilterClearBtn">条件をクリア</button>
+        </div>
+
+        <div id="historyList" class="entry-list"></div>
+      </div>
+    </section>
+
+    <!-- 通院メモ -->
+    <section class="tab" data-tab="summary">
+      <div class="card no-print">
+        <h2>通院用メモを作成</h2>
+        <p class="section-desc">期間を選んで「メモを作成」を押すと、診察で話しやすいようにまとめた要約が表示されます。コピーして共有したり、そのまま印刷したりできます。</p>
+
+        <div class="row2">
+          <div class="field">
+            <label for="summaryFrom">開始日</label>
+            <input type="date" id="summaryFrom" />
+          </div>
+          <div class="field">
+            <label for="summaryTo">終了日</label>
+            <input type="date" id="summaryTo" />
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="primary" id="generateSummaryBtn">メモを作成</button>
+          <button type="button" class="secondary" id="copySummaryBtn">テキストをコピー</button>
+          <button type="button" class="secondary" id="printSummaryBtn">印刷する</button>
+        </div>
+        <div id="summaryStatus" class="status"></div>
+      </div>
+
+      <div class="card" id="summaryOutputCard" style="display:none;">
+        <div class="summary-header">
+          <div class="range" id="summaryRangeLabel"></div>
+        </div>
+
+        <div class="stat-grid" id="summaryStats"></div>
+
+        <div id="summaryChart" class="chart-wrap"></div>
+        <p class="section-desc no-print" style="margin-top:0;">グラフは日ごとの気分スコアの平均値です。</p>
+
+        <div class="summary-block" id="summaryMoodBlock"></div>
+        <div class="summary-block" id="summaryThoughtBlock"></div>
+        <div class="summary-block" id="summaryDiaryBlock"></div>
+
+        <div class="field no-print" style="margin-top:18px;">
+          <label for="summaryTextOutput">コピー用テキスト</label>
+          <textarea id="summaryTextOutput" readonly></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 設定 -->
+    <section class="tab" data-tab="settings">
+      <div class="card">
+        <h2>データのバックアップ</h2>
+        <p class="section-desc">記録は端末内のブラウザにのみ保存されています。機種変更やブラウザの変更に備えて、定期的にエクスポートしておくことをおすすめします。</p>
+
+        <div class="import-export-row">
+          <button type="button" class="primary" id="exportDataBtn">データをエクスポート（JSON）</button>
+          <label class="secondary" style="display:inline-flex;align-items:center;cursor:pointer;">
+            データをインポート
+            <input type="file" id="importDataInput" accept="application/json" style="display:none;" />
+          </label>
+          <button type="button" class="danger-btn" id="clearDataBtn">すべてのデータを削除</button>
+        </div>
+        <div id="settingsStatus" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2>このアプリについて</h2>
+        <p class="section-desc">
+          このアプリは診断や治療を行うものではなく、感情や考えの記録を通じて、診察や心理面談での対話をサポートするための個人用メモツールです。記録した内容は、必要に応じて医師や心理師にそのまま見せたり、話す際の参考にしたりしてください。
+        </p>
+      </div>
+    </section>
+
+    <footer class="disclaimer">
+      もし今つらく、危険を感じるときは、一人で抱え込まず、かかりつけの医療機関や地域の相談窓口、救急（119）へご連絡ください。
+    </footer>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const STORAGE_KEY = 'kokoroMemoData_v1';
+      const EMOTION_TAGS = ['不安', '悲しい', '怒り', '焦り', '孤独', '罪悪感', '無気力', '緊張', '恐怖', 'イライラ', '喜び', '安心', '感謝', '達成感'];
+      const JP_DAYS = ['日', '月', '火', '水', '木', '金', '土'];
+
+      let data = loadData();
+      let selectedMoodTags = new Set();
+
+      // ---------- storage ----------
+      function loadData() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return { moodEntries: [], thoughtRecords: [], diaryEntries: [] };
+          const parsed = JSON.parse(raw);
+          return {
+            moodEntries: Array.isArray(parsed.moodEntries) ? parsed.moodEntries : [],
+            thoughtRecords: Array.isArray(parsed.thoughtRecords) ? parsed.thoughtRecords : [],
+            diaryEntries: Array.isArray(parsed.diaryEntries) ? parsed.diaryEntries : []
+          };
+        } catch (e) {
+          return { moodEntries: [], thoughtRecords: [], diaryEntries: [] };
+        }
+      }
+
+      function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      function makeId() {
+        return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+      }
+
+      // ---------- date helpers ----------
+      function pad(n) { return String(n).padStart(2, '0'); }
+
+      function isoDate(date) {
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+      }
+
+      function toDatetimeLocalValue(date) {
+        return `${isoDate(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+      }
+
+      function formatDateLabel(dateStr) {
+        const d = new Date(`${dateStr}T00:00:00`);
+        if (isNaN(d)) return dateStr;
+        return `${d.getMonth() + 1}/${d.getDate()}（${JP_DAYS[d.getDay()]}）`;
+      }
+
+      function formatDatetimeLabel(datetimeStr) {
+        const d = new Date(datetimeStr);
+        if (isNaN(d)) return datetimeStr;
+        return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()}（${JP_DAYS[d.getDay()]}） ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      }
+
+      function moodFaceFor(score) {
+        if (score <= 1) return '😢';
+        if (score <= 3) return '😟';
+        if (score <= 5) return '😐';
+        if (score <= 7) return '🙂';
+        return '😄';
+      }
+
+      function setStatus(el, message, type) {
+        if (!message) {
+          el.textContent = '';
+          el.className = 'status';
+          return;
+        }
+        el.textContent = message;
+        el.className = `status show ${type || ''}`;
+      }
+
+      // ---------- tab switching ----------
+      const navButtons = document.querySelectorAll('#appNav button');
+      const tabSections = document.querySelectorAll('section.tab');
+
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          navButtons.forEach(b => b.classList.remove('active'));
+          tabSections.forEach(s => s.classList.remove('active'));
+          btn.classList.add('active');
+          document.querySelector(`section.tab[data-tab="${btn.dataset.tab}"]`).classList.add('active');
+
+          if (btn.dataset.tab === 'history') renderHistory();
+        });
+      });
+
+      // ---------- mood tab ----------
+      const moodForm = document.getElementById('moodForm');
+      const moodDatetime = document.getElementById('moodDatetime');
+      const moodScore = document.getElementById('moodScore');
+      const moodScoreLabel = document.getElementById('moodScoreLabel');
+      const moodFace = document.getElementById('moodFace');
+      const moodTagChips = document.getElementById('moodTagChips');
+      const moodCustomTag = document.getElementById('moodCustomTag');
+      const moodAddTagBtn = document.getElementById('moodAddTagBtn');
+      const moodSleepHours = document.getElementById('moodSleepHours');
+      const moodSleepQuality = document.getElementById('moodSleepQuality');
+      const moodNote = document.getElementById('moodNote');
+      const moodStatus = document.getElementById('moodStatus');
+      const moodRecentList = document.getElementById('moodRecentList');
+
+      function renderTagChips(container, allTags, selectedSet) {
+        container.innerHTML = '';
+        allTags.forEach(tag => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'tag-chip' + (selectedSet.has(tag) ? ' selected' : '');
+          chip.textContent = tag;
+          chip.addEventListener('click', () => {
+            if (selectedSet.has(tag)) selectedSet.delete(tag);
+            else selectedSet.add(tag);
+            chip.classList.toggle('selected');
+          });
+          container.appendChild(chip);
+        });
+      }
+
+      function updateMoodScoreUI() {
+        const val = Number(moodScore.value);
+        moodScoreLabel.textContent = val;
+        moodFace.textContent = moodFaceFor(val);
+      }
+
+      moodScore.addEventListener('input', updateMoodScoreUI);
+
+      moodAddTagBtn.addEventListener('click', () => {
+        const val = moodCustomTag.value.trim();
+        if (!val) return;
+        if (!EMOTION_TAGS.includes(val)) EMOTION_TAGS.push(val);
+        selectedMoodTags.add(val);
+        moodCustomTag.value = '';
+        renderTagChips(moodTagChips, EMOTION_TAGS, selectedMoodTags);
+        populateThoughtEmotionSelect();
+      });
+
+      function resetMoodForm() {
+        moodDatetime.value = toDatetimeLocalValue(new Date());
+        moodScore.value = 5;
+        updateMoodScoreUI();
+        selectedMoodTags = new Set();
+        renderTagChips(moodTagChips, EMOTION_TAGS, selectedMoodTags);
+        moodSleepHours.value = '';
+        moodSleepQuality.value = '';
+        moodNote.value = '';
+      }
+
+      moodForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const entry = {
+          id: makeId(),
+          datetime: moodDatetime.value,
+          score: Number(moodScore.value),
+          tags: Array.from(selectedMoodTags),
+          sleepHours: moodSleepHours.value ? Number(moodSleepHours.value) : null,
+          sleepQuality: moodSleepQuality.value || null,
+          note: moodNote.value.trim()
+        };
+
+        if (!entry.datetime) {
+          setStatus(moodStatus, '日時を入力してください。', 'error');
+          return;
+        }
+
+        data.moodEntries.push(entry);
+        saveData();
+        resetMoodForm();
+        renderMoodRecentList();
+        setStatus(moodStatus, '気分記録を保存しました。', 'success');
+      });
+
+      function renderMoodRecentList() {
+        const items = [...data.moodEntries].sort((a, b) => b.datetime.localeCompare(a.datetime)).slice(0, 5);
+        moodRecentList.innerHTML = '';
+
+        if (items.length === 0) {
+          moodRecentList.innerHTML = '<div class="empty-note">まだ記録がありません。</div>';
+          return;
+        }
+
+        items.forEach(entry => {
+          const div = document.createElement('div');
+          div.className = 'entry-item';
+          div.innerHTML = `
+            <div class="entry-item-head">
+              <div>
+                <span class="entry-badge mood">気分 ${entry.score}</span>
+                <span class="entry-date">${formatDatetimeLabel(entry.datetime)}</span>
+              </div>
+              <div class="entry-actions">
+                <button type="button" class="danger-btn" data-del-mood="${entry.id}">削除</button>
+              </div>
+            </div>
+            <div class="entry-body">${escapeHtml(entry.tags.join('、'))}${entry.note ? '\nメモ: ' + escapeHtml(entry.note) : ''}</div>
+            ${entry.sleepHours || entry.sleepQuality ? `<div class="entry-meta">睡眠: ${entry.sleepHours ? entry.sleepHours + '時間' : ''} ${entry.sleepQuality || ''}</div>` : ''}
+          `;
+          moodRecentList.appendChild(div);
+        });
+
+        moodRecentList.querySelectorAll('[data-del-mood]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('この記録を削除しますか？')) return;
+            data.moodEntries = data.moodEntries.filter(e => e.id !== btn.dataset.delMood);
+            saveData();
+            renderMoodRecentList();
+          });
+        });
+      }
+
+      // ---------- thought tab ----------
+      const thoughtForm = document.getElementById('thoughtForm');
+      const thoughtDatetime = document.getElementById('thoughtDatetime');
+      const thoughtSituation = document.getElementById('thoughtSituation');
+      const thoughtAutomatic = document.getElementById('thoughtAutomatic');
+      const thoughtEmotion = document.getElementById('thoughtEmotion');
+      const thoughtIntensityBefore = document.getElementById('thoughtIntensityBefore');
+      const thoughtIntensityBeforeLabel = document.getElementById('thoughtIntensityBeforeLabel');
+      const thoughtStatus = document.getElementById('thoughtStatus');
+      const thoughtRecentList = document.getElementById('thoughtRecentList');
+
+      function populateThoughtEmotionSelect() {
+        const current = thoughtEmotion.value;
+        thoughtEmotion.innerHTML = '';
+        EMOTION_TAGS.forEach(tag => {
+          const opt = document.createElement('option');
+          opt.value = tag;
+          opt.textContent = tag;
+          thoughtEmotion.appendChild(opt);
+        });
+        if (current && EMOTION_TAGS.includes(current)) thoughtEmotion.value = current;
+      }
+
+      thoughtIntensityBefore.addEventListener('input', () => {
+        thoughtIntensityBeforeLabel.textContent = thoughtIntensityBefore.value;
+      });
+
+      function resetThoughtForm() {
+        thoughtDatetime.value = toDatetimeLocalValue(new Date());
+        thoughtSituation.value = '';
+        thoughtAutomatic.value = '';
+        populateThoughtEmotionSelect();
+        thoughtIntensityBefore.value = 50;
+        thoughtIntensityBeforeLabel.textContent = '50';
+      }
+
+      thoughtForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const record = {
+          id: makeId(),
+          datetime: thoughtDatetime.value,
+          situation: thoughtSituation.value.trim(),
+          automaticThought: thoughtAutomatic.value.trim(),
+          emotion: thoughtEmotion.value,
+          intensityBefore: Number(thoughtIntensityBefore.value)
+        };
+
+        if (!record.datetime || !record.situation || !record.automaticThought) {
+          setStatus(thoughtStatus, '日時・状況・思ったことは必須です。', 'error');
+          return;
+        }
+
+        data.thoughtRecords.push(record);
+        saveData();
+        resetThoughtForm();
+        renderThoughtRecentList();
+        setStatus(thoughtStatus, 'メモを保存しました。', 'success');
+      });
+
+      function renderThoughtRecentList() {
+        const items = [...data.thoughtRecords].sort((a, b) => b.datetime.localeCompare(a.datetime)).slice(0, 5);
+        thoughtRecentList.innerHTML = '';
+
+        if (items.length === 0) {
+          thoughtRecentList.innerHTML = '<div class="empty-note">まだ記録がありません。</div>';
+          return;
+        }
+
+        items.forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'entry-item';
+          div.innerHTML = `
+            <div class="entry-item-head">
+              <div>
+                <span class="entry-badge thought">${escapeHtml(r.emotion)} ${r.intensityBefore}%</span>
+                <span class="entry-date">${formatDatetimeLabel(r.datetime)}</span>
+              </div>
+              <div class="entry-actions">
+                <button type="button" class="danger-btn" data-del-thought="${r.id}">削除</button>
+              </div>
+            </div>
+            <div class="entry-body">状況: ${escapeHtml(r.situation)}\n思ったこと: ${escapeHtml(r.automaticThought)}</div>
+          `;
+          thoughtRecentList.appendChild(div);
+        });
+
+        thoughtRecentList.querySelectorAll('[data-del-thought]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('この記録を削除しますか？')) return;
+            data.thoughtRecords = data.thoughtRecords.filter(r => r.id !== btn.dataset.delThought);
+            saveData();
+            renderThoughtRecentList();
+          });
+        });
+      }
+
+      // ---------- diary tab ----------
+      const diaryForm = document.getElementById('diaryForm');
+      const diaryDate = document.getElementById('diaryDate');
+      const diaryTitle = document.getElementById('diaryTitle');
+      const diaryBody = document.getElementById('diaryBody');
+      const diaryStatus = document.getElementById('diaryStatus');
+      const diaryRecentList = document.getElementById('diaryRecentList');
+      const diaryPromptChips = document.getElementById('diaryPromptChips');
+
+      const DIARY_PROMPTS = ['今日あったこと', '今の気分・体調', '気になっていること', '眠れたか'];
+
+      function renderDiaryPromptChips() {
+        diaryPromptChips.innerHTML = '';
+        DIARY_PROMPTS.forEach(prompt => {
+          const chip = document.createElement('button');
+          chip.type = 'button';
+          chip.className = 'tag-chip';
+          chip.textContent = prompt;
+          chip.addEventListener('click', () => {
+            const prefix = diaryBody.value && !diaryBody.value.endsWith('\n') ? '\n' : '';
+            diaryBody.value += `${prefix}■ ${prompt}\n`;
+            diaryBody.focus();
+          });
+          diaryPromptChips.appendChild(chip);
+        });
+      }
+
+      function resetDiaryForm() {
+        diaryDate.value = isoDate(new Date());
+        diaryTitle.value = '';
+        diaryBody.value = '';
+      }
+
+      diaryForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const entry = {
+          id: makeId(),
+          date: diaryDate.value,
+          title: diaryTitle.value.trim(),
+          body: diaryBody.value.trim()
+        };
+
+        if (!entry.date || !entry.body) {
+          setStatus(diaryStatus, '日付と本文は必須です。', 'error');
+          return;
+        }
+
+        data.diaryEntries.push(entry);
+        saveData();
+        resetDiaryForm();
+        renderDiaryRecentList();
+        setStatus(diaryStatus, '日記を保存しました。', 'success');
+      });
+
+      function renderDiaryRecentList() {
+        const items = [...data.diaryEntries].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+        diaryRecentList.innerHTML = '';
+
+        if (items.length === 0) {
+          diaryRecentList.innerHTML = '<div class="empty-note">まだ記録がありません。</div>';
+          return;
+        }
+
+        items.forEach(entry => {
+          const div = document.createElement('div');
+          div.className = 'entry-item';
+          div.innerHTML = `
+            <div class="entry-item-head">
+              <div>
+                <span class="entry-badge diary">日記</span>
+                <span class="entry-date">${formatDateLabel(entry.date)}${entry.title ? ' - ' + escapeHtml(entry.title) : ''}</span>
+              </div>
+              <div class="entry-actions">
+                <button type="button" class="danger-btn" data-del-diary="${entry.id}">削除</button>
+              </div>
+            </div>
+            <div class="entry-body">${escapeHtml(entry.body)}</div>
+          `;
+          diaryRecentList.appendChild(div);
+        });
+
+        diaryRecentList.querySelectorAll('[data-del-diary]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('この記録を削除しますか？')) return;
+            data.diaryEntries = data.diaryEntries.filter(e => e.id !== btn.dataset.delDiary);
+            saveData();
+            renderDiaryRecentList();
+          });
+        });
+      }
+
+      // ---------- history tab ----------
+      const historyTypeFilter = document.getElementById('historyTypeFilter');
+      const historyFromFilter = document.getElementById('historyFromFilter');
+      const historyToFilter = document.getElementById('historyToFilter');
+      const historyFilterClearBtn = document.getElementById('historyFilterClearBtn');
+      const historyList = document.getElementById('historyList');
+
+      function unifiedEntries() {
+        const moods = data.moodEntries.map(e => ({ type: 'mood', date: e.datetime.slice(0, 10), sortKey: e.datetime, raw: e }));
+        const thoughts = data.thoughtRecords.map(r => ({ type: 'thought', date: r.datetime.slice(0, 10), sortKey: r.datetime, raw: r }));
+        const diaries = data.diaryEntries.map(e => ({ type: 'diary', date: e.date, sortKey: e.date + 'T00:00', raw: e }));
+        return [...moods, ...thoughts, ...diaries].sort((a, b) => b.sortKey.localeCompare(a.sortKey));
+      }
+
+      function renderHistory() {
+        const typeVal = historyTypeFilter.value;
+        const from = historyFromFilter.value;
+        const to = historyToFilter.value;
+
+        let items = unifiedEntries();
+
+        if (typeVal !== 'all') items = items.filter(i => i.type === typeVal);
+        if (from) items = items.filter(i => i.date >= from);
+        if (to) items = items.filter(i => i.date <= to);
+
+        historyList.innerHTML = '';
+
+        if (items.length === 0) {
+          historyList.innerHTML = '<div class="empty-note">条件に一致する記録がありません。</div>';
+          return;
+        }
+
+        items.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'entry-item';
+
+          if (item.type === 'mood') {
+            const e = item.raw;
+            div.innerHTML = `
+              <div class="entry-item-head">
+                <div>
+                  <span class="entry-badge mood">気分 ${e.score}</span>
+                  <span class="entry-date">${formatDatetimeLabel(e.datetime)}</span>
+                </div>
+                <div class="entry-actions"><button type="button" class="danger-btn" data-del-mood="${e.id}">削除</button></div>
+              </div>
+              <div class="entry-body">${escapeHtml(e.tags.join('、'))}${e.note ? '\nメモ: ' + escapeHtml(e.note) : ''}</div>
+            `;
+          } else if (item.type === 'thought') {
+            const r = item.raw;
+            div.innerHTML = `
+              <div class="entry-item-head">
+                <div>
+                  <span class="entry-badge thought">${escapeHtml(r.emotion)} ${r.intensityBefore}%</span>
+                  <span class="entry-date">${formatDatetimeLabel(r.datetime)}</span>
+                </div>
+                <div class="entry-actions"><button type="button" class="danger-btn" data-del-thought="${r.id}">削除</button></div>
+              </div>
+              <div class="entry-body">状況: ${escapeHtml(r.situation)}\n思ったこと: ${escapeHtml(r.automaticThought)}</div>
+            `;
+          } else {
+            const e = item.raw;
+            div.innerHTML = `
+              <div class="entry-item-head">
+                <div>
+                  <span class="entry-badge diary">日記</span>
+                  <span class="entry-date">${formatDateLabel(e.date)}${e.title ? ' - ' + escapeHtml(e.title) : ''}</span>
+                </div>
+                <div class="entry-actions"><button type="button" class="danger-btn" data-del-diary="${e.id}">削除</button></div>
+              </div>
+              <div class="entry-body">${escapeHtml(e.body)}</div>
+            `;
+          }
+
+          historyList.appendChild(div);
+        });
+
+        historyList.querySelectorAll('[data-del-mood]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('この記録を削除しますか？')) return;
+            data.moodEntries = data.moodEntries.filter(e => e.id !== btn.dataset.delMood);
+            saveData();
+            renderHistory();
+            renderMoodRecentList();
+          });
+        });
+        historyList.querySelectorAll('[data-del-thought]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('この記録を削除しますか？')) return;
+            data.thoughtRecords = data.thoughtRecords.filter(r => r.id !== btn.dataset.delThought);
+            saveData();
+            renderHistory();
+            renderThoughtRecentList();
+          });
+        });
+        historyList.querySelectorAll('[data-del-diary]').forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (!confirm('この記録を削除しますか？')) return;
+            data.diaryEntries = data.diaryEntries.filter(e => e.id !== btn.dataset.delDiary);
+            saveData();
+            renderHistory();
+            renderDiaryRecentList();
+          });
+        });
+      }
+
+      historyTypeFilter.addEventListener('change', renderHistory);
+      historyFromFilter.addEventListener('change', renderHistory);
+      historyToFilter.addEventListener('change', renderHistory);
+      historyFilterClearBtn.addEventListener('click', () => {
+        historyTypeFilter.value = 'all';
+        historyFromFilter.value = '';
+        historyToFilter.value = '';
+        renderHistory();
+      });
+
+      // ---------- summary tab ----------
+      const summaryFrom = document.getElementById('summaryFrom');
+      const summaryTo = document.getElementById('summaryTo');
+      const generateSummaryBtn = document.getElementById('generateSummaryBtn');
+      const copySummaryBtn = document.getElementById('copySummaryBtn');
+      const printSummaryBtn = document.getElementById('printSummaryBtn');
+      const summaryStatus = document.getElementById('summaryStatus');
+      const summaryOutputCard = document.getElementById('summaryOutputCard');
+      const summaryRangeLabel = document.getElementById('summaryRangeLabel');
+      const summaryStats = document.getElementById('summaryStats');
+      const summaryChart = document.getElementById('summaryChart');
+      const summaryMoodBlock = document.getElementById('summaryMoodBlock');
+      const summaryThoughtBlock = document.getElementById('summaryThoughtBlock');
+      const summaryDiaryBlock = document.getElementById('summaryDiaryBlock');
+      const summaryTextOutput = document.getElementById('summaryTextOutput');
+
+      function defaultSummaryRange() {
+        const to = new Date();
+        const from = new Date();
+        from.setDate(from.getDate() - 13);
+        summaryFrom.value = isoDate(from);
+        summaryTo.value = isoDate(to);
+      }
+
+      function generateSummary() {
+        const from = summaryFrom.value;
+        const to = summaryTo.value;
+
+        if (!from || !to) {
+          setStatus(summaryStatus, '開始日と終了日を選んでください。', 'error');
+          return;
+        }
+        if (from > to) {
+          setStatus(summaryStatus, '開始日は終了日より前の日付にしてください。', 'error');
+          return;
+        }
+
+        setStatus(summaryStatus, '', '');
+
+        const moods = data.moodEntries
+          .filter(e => e.datetime.slice(0, 10) >= from && e.datetime.slice(0, 10) <= to)
+          .sort((a, b) => a.datetime.localeCompare(b.datetime));
+
+        const thoughts = data.thoughtRecords
+          .filter(r => r.datetime.slice(0, 10) >= from && r.datetime.slice(0, 10) <= to)
+          .sort((a, b) => a.datetime.localeCompare(b.datetime));
+
+        const diaries = data.diaryEntries
+          .filter(e => e.date >= from && e.date <= to)
+          .sort((a, b) => a.date.localeCompare(b.date));
+
+        summaryOutputCard.style.display = 'block';
+        summaryRangeLabel.textContent = `${formatDateLabel(from)} 〜 ${formatDateLabel(to)}`;
+
+        // stats
+        const scores = moods.map(m => m.score);
+        const avg = scores.length ? (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1) : '-';
+        const max = scores.length ? Math.max(...scores) : '-';
+        const min = scores.length ? Math.min(...scores) : '-';
+        const recordedDays = new Set(moods.map(m => m.datetime.slice(0, 10))).size;
+
+        summaryStats.innerHTML = `
+          <div class="stat-box"><div class="num">${recordedDays}</div><div class="lbl">気分記録日数</div></div>
+          <div class="stat-box"><div class="num">${avg}</div><div class="lbl">平均スコア</div></div>
+          <div class="stat-box"><div class="num">${max}</div><div class="lbl">最高スコア</div></div>
+          <div class="stat-box"><div class="num">${min}</div><div class="lbl">最低スコア</div></div>
+        `;
+
+        // tag frequency
+        const tagCount = {};
+        moods.forEach(m => m.tags.forEach(t => { tagCount[t] = (tagCount[t] || 0) + 1; }));
+        const topTags = Object.entries(tagCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+        // daily average for chart
+        const dayMap = {};
+        moods.forEach(m => {
+          const d = m.datetime.slice(0, 10);
+          if (!dayMap[d]) dayMap[d] = [];
+          dayMap[d].push(m.score);
+        });
+        const days = Object.keys(dayMap).sort();
+
+        summaryChart.innerHTML = '';
+        if (days.length === 0) {
+          summaryChart.innerHTML = '<div class="empty-note">この期間の気分記録がありません。</div>';
+        } else {
+          days.forEach(d => {
+            const arr = dayMap[d];
+            const avgScore = arr.reduce((a, b) => a + b, 0) / arr.length;
+            const col = document.createElement('div');
+            col.className = 'chart-bar-col';
+            const barHeight = Math.max(4, (avgScore / 10) * 110);
+            const dd = new Date(`${d}T00:00:00`);
+            col.innerHTML = `
+              <div class="chart-bar" style="height:${barHeight}px" title="${d}: ${avgScore.toFixed(1)}"></div>
+              <div class="chart-label">${dd.getMonth() + 1}/${dd.getDate()}</div>
+            `;
+            summaryChart.appendChild(col);
+          });
+        }
+
+        // mood block
+        if (moods.length === 0) {
+          summaryMoodBlock.innerHTML = '<h3>気分の記録</h3><div class="empty-note">この期間の記録はありません。</div>';
+        } else {
+          const tagLine = topTags.length ? `<div class="summary-line">よく見られた感情: ${topTags.map(([t, c]) => `${t}(${c})`).join('、')}</div>` : '';
+          const lines = moods.map(m => `
+            <div class="summary-line">
+              <strong>${formatDatetimeLabel(m.datetime)}</strong> スコア${m.score}${m.tags.length ? ' [' + escapeHtml(m.tags.join('、')) + ']' : ''}
+              ${m.note ? '<br>メモ: ' + escapeHtml(m.note) : ''}
+            </div>
+          `).join('');
+          summaryMoodBlock.innerHTML = `<h3>気分の記録</h3>${tagLine}${lines}`;
+        }
+
+        // thought block
+        if (thoughts.length === 0) {
+          summaryThoughtBlock.innerHTML = '<h3>考えたことのメモ</h3><div class="empty-note">この期間の記録はありません。</div>';
+        } else {
+          const lines = thoughts.map(t => `
+            <div class="summary-line">
+              <strong>${formatDatetimeLabel(t.datetime)}</strong> 気分: ${escapeHtml(t.emotion)} ${t.intensityBefore}%<br>
+              状況: ${escapeHtml(t.situation)}<br>
+              思ったこと: ${escapeHtml(t.automaticThought)}
+            </div>
+          `).join('');
+          summaryThoughtBlock.innerHTML = `<h3>考えたことのメモ</h3>${lines}`;
+        }
+
+        // diary block
+        if (diaries.length === 0) {
+          summaryDiaryBlock.innerHTML = '<h3>日記</h3><div class="empty-note">この期間の記録はありません。</div>';
+        } else {
+          const lines = diaries.map(d => `
+            <div class="summary-line">
+              <strong>${formatDateLabel(d.date)}${d.title ? ' - ' + escapeHtml(d.title) : ''}</strong><br>
+              ${escapeHtml(d.body)}
+            </div>
+          `).join('');
+          summaryDiaryBlock.innerHTML = `<h3>日記</h3>${lines}`;
+        }
+
+        summaryTextOutput.value = buildSummaryText(from, to, moods, thoughts, diaries, avg, max, min, recordedDays, topTags);
+      }
+
+      function buildSummaryText(from, to, moods, thoughts, diaries, avg, max, min, recordedDays, topTags) {
+        const lines = [];
+        lines.push(`【通院メモ】${formatDateLabel(from)} 〜 ${formatDateLabel(to)}`);
+        lines.push('');
+        lines.push('■ 気分の概要');
+        lines.push(`記録日数: ${recordedDays}日 / 平均スコア: ${avg} / 最高: ${max} / 最低: ${min}`);
+        if (topTags.length) lines.push(`よく見られた感情: ${topTags.map(([t, c]) => `${t}(${c})`).join('、')}`);
+        lines.push('');
+
+        lines.push('■ 気分の推移');
+        if (moods.length === 0) {
+          lines.push('記録なし');
+        } else {
+          moods.forEach(m => {
+            let l = `${formatDatetimeLabel(m.datetime)} スコア${m.score}`;
+            if (m.tags.length) l += ` [${m.tags.join('、')}]`;
+            if (m.note) l += ` メモ:${m.note}`;
+            lines.push(l);
+          });
+        }
+        lines.push('');
+
+        lines.push('■ 考えたことのメモ');
+        if (thoughts.length === 0) {
+          lines.push('記録なし');
+        } else {
+          thoughts.forEach(t => {
+            lines.push(`${formatDatetimeLabel(t.datetime)}`);
+            lines.push(` 状況: ${t.situation}`);
+            lines.push(` 思ったこと: ${t.automaticThought}`);
+            lines.push(` 気分: ${t.emotion} ${t.intensityBefore}%`);
+          });
+        }
+        lines.push('');
+
+        lines.push('■ 日記');
+        if (diaries.length === 0) {
+          lines.push('記録なし');
+        } else {
+          diaries.forEach(d => {
+            lines.push(`${formatDateLabel(d.date)}${d.title ? ' ' + d.title : ''}`);
+            lines.push(` ${d.body}`);
+          });
+        }
+
+        return lines.join('\n');
+      }
+
+      generateSummaryBtn.addEventListener('click', generateSummary);
+
+      copySummaryBtn.addEventListener('click', async () => {
+        if (!summaryTextOutput.value) {
+          setStatus(summaryStatus, '先に「メモを作成」を押してください。', 'error');
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(summaryTextOutput.value);
+          setStatus(summaryStatus, 'コピーしました。', 'success');
+        } catch (e) {
+          summaryTextOutput.removeAttribute('readonly');
+          summaryTextOutput.focus();
+          summaryTextOutput.select();
+          setStatus(summaryStatus, 'コピーできませんでした。テキストを選択して手動でコピーしてください。', 'error');
+        }
+      });
+
+      printSummaryBtn.addEventListener('click', () => {
+        if (!summaryTextOutput.value) {
+          setStatus(summaryStatus, '先に「メモを作成」を押してください。', 'error');
+          return;
+        }
+        window.print();
+      });
+
+      // ---------- settings tab ----------
+      const exportDataBtn = document.getElementById('exportDataBtn');
+      const importDataInput = document.getElementById('importDataInput');
+      const clearDataBtn = document.getElementById('clearDataBtn');
+      const settingsStatus = document.getElementById('settingsStatus');
+
+      exportDataBtn.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kokoro-memo-${isoDate(new Date())}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        setStatus(settingsStatus, 'エクスポートしました。', 'success');
+      });
+
+      importDataInput.addEventListener('change', () => {
+        const file = importDataInput.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(reader.result);
+            if (!confirm('現在のデータに追加でインポートします。よろしいですか？')) return;
+
+            data.moodEntries = data.moodEntries.concat(Array.isArray(parsed.moodEntries) ? parsed.moodEntries : []);
+            data.thoughtRecords = data.thoughtRecords.concat(Array.isArray(parsed.thoughtRecords) ? parsed.thoughtRecords : []);
+            data.diaryEntries = data.diaryEntries.concat(Array.isArray(parsed.diaryEntries) ? parsed.diaryEntries : []);
+            saveData();
+            renderMoodRecentList();
+            renderThoughtRecentList();
+            renderDiaryRecentList();
+            setStatus(settingsStatus, 'インポートしました。', 'success');
+          } catch (e) {
+            setStatus(settingsStatus, 'ファイルの読み込みに失敗しました。', 'error');
+          }
+          importDataInput.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      clearDataBtn.addEventListener('click', () => {
+        if (!confirm('すべての記録を削除します。この操作は取り消せません。よろしいですか？')) return;
+        if (!confirm('本当に削除してよろしいですか？')) return;
+        data = { moodEntries: [], thoughtRecords: [], diaryEntries: [] };
+        saveData();
+        renderMoodRecentList();
+        renderThoughtRecentList();
+        renderDiaryRecentList();
+        setStatus(settingsStatus, 'すべてのデータを削除しました。', 'success');
+      });
+
+      // ---------- utils ----------
+      function escapeHtml(str) {
+        return String(str || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      // ---------- init ----------
+      renderTagChips(moodTagChips, EMOTION_TAGS, selectedMoodTags);
+      populateThoughtEmotionSelect();
+      renderDiaryPromptChips();
+      resetMoodForm();
+      resetThoughtForm();
+      resetDiaryForm();
+      defaultSummaryRange();
+      renderMoodRecentList();
+      renderThoughtRecentList();
+      renderDiaryRecentList();
+    });
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js');
+    }
+  </script>
+</body>
+</html>
