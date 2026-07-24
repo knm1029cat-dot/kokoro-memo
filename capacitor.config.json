@@ -1,0 +1,8 @@
+{
+  "appId": "com.kokoromemo.app",
+  "appName": "こころメモ",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
