@@ -535,7 +535,7 @@
     <section class="tab" data-tab="diary">
       <div class="card">
         <h2>日記を書く</h2>
-        <p class="section-desc">書くことに迷ったら、下のボタンをタップすると書き出しのヒントが入ります。決まった形式はないので、思いつくことから自由に書いてください。</p>
+        <p class="section-desc">形式にとらわれず、その日にあったことや感じたことを自由に書き留めておけます。</p>
 
         <form id="diaryForm">
           <div class="row2">
@@ -551,8 +551,7 @@
 
           <div class="field">
             <label for="diaryBody">本文</label>
-            <div class="tag-chips" id="diaryPromptChips" style="margin-bottom:10px;"></div>
-            <textarea id="diaryBody" style="min-height:160px" placeholder="例）&#10;・今日あったこと&#10;・今の気分や体調&#10;・気になっていること" required></textarea>
+            <textarea id="diaryBody" style="min-height:160px" placeholder="自由に書いてください" required></textarea>
           </div>
 
           <div class="btn-row">
@@ -982,25 +981,6 @@
       const diaryBody = document.getElementById('diaryBody');
       const diaryStatus = document.getElementById('diaryStatus');
       const diaryRecentList = document.getElementById('diaryRecentList');
-      const diaryPromptChips = document.getElementById('diaryPromptChips');
-
-      const DIARY_PROMPTS = ['今日あったこと', '今の気分・体調', '気になっていること', '眠れたか'];
-
-      function renderDiaryPromptChips() {
-        diaryPromptChips.innerHTML = '';
-        DIARY_PROMPTS.forEach(prompt => {
-          const chip = document.createElement('button');
-          chip.type = 'button';
-          chip.className = 'tag-chip';
-          chip.textContent = prompt;
-          chip.addEventListener('click', () => {
-            const prefix = diaryBody.value && !diaryBody.value.endsWith('\n') ? '\n' : '';
-            diaryBody.value += `${prefix}■ ${prompt}\n`;
-            diaryBody.focus();
-          });
-          diaryPromptChips.appendChild(chip);
-        });
-      }
 
       function resetDiaryForm() {
         diaryDate.value = isoDate(new Date());
@@ -1471,7 +1451,6 @@
       // ---------- init ----------
       renderTagChips(moodTagChips, EMOTION_TAGS, selectedMoodTags);
       populateThoughtEmotionSelect();
-      renderDiaryPromptChips();
       resetMoodForm();
       resetThoughtForm();
       resetDiaryForm();
