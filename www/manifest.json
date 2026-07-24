@@ -1,0 +1,18 @@
+{
+  "name": "こころメモ",
+  "short_name": "こころメモ",
+  "description": "気分の記録・考えたこと・日記を書き留められるメモアプリ",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f4f1fb",
+  "theme_color": "#6d6ac2",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
